@@ -12,7 +12,10 @@ def randomParams ():
     paramRanges = array([1, 2, 50, 1, 100])
     return (random.rand(5) - 0.5) * 2 * paramRanges
 
-trueParams = randomParams()
+#trueParams = randomParams()
+# I like these ones
+trueParams = array([  4.29383821e-02, 9.60946324e-01, 2.05602723e+01, -3.13699765e-01, -5.78706031e+01])
+
 sampleX = linspace(-10, 10, 1000)
 trueY = func(trueParams, sampleX)
 
@@ -22,7 +25,7 @@ myPopulation = genetic.Population(
     fitness_func = lambda params: sum((func(params, sampleX) - trueY) ** 2)
 )
 
-myPopulation.evolve(10)
+myPopulation.evolve(100)
 
 mostFit = myPopulation.selectMostFit(5)
 mostFit = average(mostFit, 0)
@@ -33,5 +36,7 @@ print("Actual: ", trueParams)
 print("Estimate: ", mostFit)
 print("Error: ", (trueParams - mostFit) / trueParams)
 print("R^2 = {}".format(rSquared))
+
+
 pyplot.plot(sampleX, trueY, sampleX, estimatedY)
 pyplot.show()

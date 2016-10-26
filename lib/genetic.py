@@ -7,8 +7,9 @@ class  Population:
         stable_pop = 300,
         means = None,
         std_devs = None,
-        repro_rate = 10,
+        repro_rate = 25,
         mutation = 0.1,
+        delta_mutation = 0.933,  # Halves every 10 generations
         fitness_func = None
     ):
         assert fitness_func is not None
@@ -26,6 +27,7 @@ class  Population:
         self.std_devs = std_devs
         self.repro_rate = repro_rate
         self.mutation = mutation
+        self.delta_mutation = delta_mutation
         self.fitness_func = fitness_func
 
         self.populate()
@@ -36,10 +38,16 @@ class  Population:
         for col in range(self.dimm):
             self.population[:, col] = self.population[:, col] * self.std_devs[col] + self.means[col]
 
-    def evolve (self, generations):
+    def evolve (self, generations, show_progress=True):
         for n in range(generations):
             self.procreate()
             self.select()
+            self.mutation = self.mutation * self.delta_mutation
+            if show_progress:
+                print("{:.0f}%".format(100 * n / generations))
+
+    def get_fitness (self, sample):
+        return apply_along_axis(self.fitness_func, 1, sample)
 
     def procreate (self):
         for i in range(self.stable_pop):
@@ -52,11 +60,11 @@ class  Population:
             self.nextPopulation[(i * self.repro_rate):((i + 1) * self.repro_rate)] = offspring
 
     def select (self):
-        fitness = apply_along_axis(self.fitness_func, 1, self.nextPopulation)
+        fitness = self.get_fitness(self.nextPopulation)
         fit_indices = argpartition(fitness, self.stable_pop)[0:self.stable_pop]
         self.population = self.nextPopulation[fit_indices]
 
-    def selectMostFit (self, n):
+    def selectMostFit (self, n=1):
         fitness = apply_along_axis(self.fitness_func, 1, self.population)
         fit_indices = argpartition(fitness, n)[0:n]
         return self.population[fit_indices]
