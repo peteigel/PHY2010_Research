@@ -16,25 +16,18 @@ trueParams = randomParams()
 sampleX = linspace(-10, 10, 1000)
 trueY = func(trueParams, sampleX)
 
-pop_size = 300
-repro_rate = 10
-std_dev = array([1, 1, 10, 1, 100])
-num_generations = 50
+myPopulation = genetic.Population(
+    dimm = 5,
+    std_devs = array([1, 1, 2, 1, 64]),
+    fitness_func = lambda params: sum((func(params, sampleX) - trueY) ** 2)
+)
 
-myPopulation = genetic.Population(5, pop_size)
-myPopulation.populate(zeros(5), std_dev)
+myPopulation.evolve(10)
 
-eval_fitness = lambda params: sum((func(params, sampleX) - trueY) ** 2)
-
-for i in range(num_generations):
-    myPopulation.createOffspring(repro_rate, std_dev * 0.1)
-    myPopulation.cullOffspring(eval_fitness)
-    print ("{:.0f}%".format(i / num_generations * 100))
-
-mostFit = myPopulation.selectMostFit(5, eval_fitness)
+mostFit = myPopulation.selectMostFit(5)
 mostFit = average(mostFit, 0)
 estimatedY = func(mostFit, sampleX)
-rSquared = 1 - (eval_fitness(mostFit) / sum((trueY - average(trueY)) ** 2))
+rSquared = 1 - sum((estimatedY - trueY) ** 2) / sum((trueY - average(trueY)) ** 2)
 
 print("Actual: ", trueParams)
 print("Estimate: ", mostFit)
