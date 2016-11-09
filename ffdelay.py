@@ -1,20 +1,15 @@
 from numpy import *
+from matplotlib import pyplot
+from scipy import signal
 from lib import genetic
 from lib.audio import ioutils
+from lib.audio import compare
 
 # Params: [delay time samples, delay gain (lin)]
 def delay (params, x):
     delaySamples = abs(floor(params[0]))
     delaySpace = zeros(delaySamples)
     return concatenate((x, delaySpace)) + params[1] * concatenate((delaySpace, x))
-
-def compareSingals (x1, x2):
-    size1 = size(x1)
-    size2 = size(x2)
-    if (size1 > size2):
-        return sum((x1[0:size2] - x2) ** 2)
-    else:
-        return sum((x1 - x2[0:size1]) ** 2)
 
 trueParams = array([44.1 * 100, 0.66])
 Fs, inputSignal = ioutils.loadWav('audioSamples/drums.wav');
@@ -24,7 +19,7 @@ targetSignal = delay(trueParams, inputSignal)
 def fitnessFunc (params):
     if (params[0] <= 0.0):
         return float("inf")
-    return compareSingals(targetSignal, delay(params, inputSignal))
+    return compare.compare_envelope(targetSignal, delay(params, inputSignal))
 
 population = genetic.Population(
     dimm=2,

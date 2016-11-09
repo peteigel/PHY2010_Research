@@ -1,7 +1,7 @@
 from numpy import *
 from scipy import signal
 from scipy import fftpack
-env_filter_b, env_filter_a = signal.butter(2, 20/22050, btype='lowpass')
+env_filter_b, env_filter_a = signal.butter(2, 10/22050, btype='lowpass')
 
 def safe_compare(x1, x2, fn):
         size1 = size(x1)
@@ -20,10 +20,10 @@ def compare_samples(x1, x2, func=lambda x: x):
 def compare_envelope(x1, x2):
     return compare_samples(
         x1, x2,
-        func = lambda x: signal.lfilter(env_filter_b, env_filter_a, x)
+        func = lambda x: signal.lfilter(env_filter_b, env_filter_a, x ** 2)
     )
 
-def compare_spectra(x1, x2):
+def compare_spectrum(x1, x2):
     return compare_samples(
         x1, x2,
         lambda x: fftpack.dct(x, n=2205)
