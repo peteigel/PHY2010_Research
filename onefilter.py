@@ -20,18 +20,24 @@ def fitnessFunc (params):
 filterPopulation = genetic.Population(
     dimm=6,
     means=zeros(6),
-    std_devs=ones(6) * 0.5,
+    std_devs=ones(6) * 10,
     fitness_func=fitnessFunc,
     stable_pop = 20
 )
 
 print("Evolving:")
-filterPopulation.evolve(25)
+filterPopulation.evolve(100)
 
 king = filterPopulation.selectMostFit(1)[0]
 
 print("Estimate: ", king)
 
+outSignal = onefilter(king, drySignal)
 
+fin, pin = signal.welch(targetSignal, Fs, scaling='spectrum')
+fout, pout = signal.welch(outSignal, Fs, scaling='spectrum')
 
-ioutils.saveWav('filterestimate.temp.wav', Fs, onefilter(king, drySignal))
+pyplot.loglog(fin, pin, fout, pout)
+pyplot.show()
+
+ioutils.saveWav('filterestimate.temp.wav', Fs, outSignal)
