@@ -44,5 +44,13 @@ king = population.selectMostFit(1)[0]
 print("Actual: ", trueParams)
 print("Estimate: ", king)
 
-ioutils.saveWav('fbtarget.temp.wav', Fs, targetSignal)
-ioutils.saveWav('fbestimate.temp.wav', Fs, distortion(king, inputSignal))
+outSignal = distortion(king, inputSignal)
+
+fin, pin = signal.welch(targetSignal, Fs, scaling='spectrum')
+fout, pout = signal.welch(outSignal, Fs, scaling='spectrum')
+
+pyplot.loglog(fin, pin, fout, pout)
+pyplot.show()
+
+ioutils.saveWav('cdtarget.temp.wav', Fs, targetSignal)
+ioutils.saveWav('cdestimate.temp.wav', Fs, distortion(king, inputSignal))

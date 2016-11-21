@@ -22,7 +22,7 @@ filterPopulation = genetic.Population(
     means=zeros(6),
     std_devs=ones(6) * 10,
     fitness_func=fitnessFunc,
-    stable_pop = 20
+    stable_pop = 80
 )
 
 print("Evolving:")
@@ -41,3 +41,4 @@ pyplot.loglog(fin, pin, fout, pout)
 pyplot.show()
 
 ioutils.saveWav('filterestimate.temp.wav', Fs, outSignal)
+ioutils.saveWav('filtertarget.temp.wav', Fs, targetSignal)
