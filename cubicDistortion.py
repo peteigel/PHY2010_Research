@@ -26,7 +26,7 @@ targetSignal = distortion(trueParams, inputSignal)
 def fitnessFunc (params):
     if (params[0] <= 0.0):
         return float("inf")
-    return compare.compare_envelope(targetSignal, distortion(params, inputSignal))
+    return compare.compare_samples(targetSignal, distortion(params, inputSignal))
 
 population = genetic.Population(
     dimm=1,
