@@ -30,20 +30,26 @@ def fitnessFunc (params):
 population = genetic.Population(
     dimm=2,
     means=array([44.1 * 300, 1]),
-    std_devs=array([44.1 * 300, .5]),
+    std_devs=array([44.1 * 300, 1]),
     fitness_func=fitnessFunc,
-    stable_pop = 5
+    stable_pop = 15
 )
 
 print("Evolving:")
-population.evolve(5)
+population.evolve(10)
 
 king = population.selectMostFit(1)[0]
 
 print("Actual: ", trueParams)
 print("Estimate: ", king)
 
+outSignal = delay(king, inputSignal)
+
+fin, pin = signal.welch(targetSignal, Fs, scaling='spectrum')
+fout, pout = signal.welch(outSignal, Fs, scaling='spectrum')
+
+pyplot.loglog(fin, pin, fout, pout)
+pyplot.show()
+
 ioutils.saveWav('fbtarget.temp.wav', Fs, targetSignal)
 ioutils.saveWav('fbestimate.temp.wav', Fs, delay(king, inputSignal))
-
-#big booty hoe
