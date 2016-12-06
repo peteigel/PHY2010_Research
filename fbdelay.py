@@ -4,7 +4,7 @@ from scipy import signal
 from lib import genetic
 from lib.audio import ioutils
 from lib.audio import compare
-
+from lib.audio import plots
 
 def delay (params, x):
     d = abs(floor(params[0]))
@@ -45,11 +45,7 @@ print("Estimate: ", king)
 
 outSignal = delay(king, inputSignal)
 
-fin, pin = signal.welch(targetSignal, Fs, scaling='spectrum')
-fout, pout = signal.welch(outSignal, Fs, scaling='spectrum')
-
-pyplot.loglog(fin, pin, fout, pout)
-pyplot.show()
+plots.plotSamples(targetSignal, outSignal, Fs, trim=True)
 
 ioutils.saveWav('fbtarget.temp.wav', Fs, targetSignal)
 ioutils.saveWav('fbestimate.temp.wav', Fs, delay(king, inputSignal))

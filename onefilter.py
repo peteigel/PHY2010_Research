@@ -3,12 +3,12 @@ from numpy import *
 from lib import genetic
 from lib.audio import compare
 from lib.audio import ioutils
-from matplotlib import pyplot
+from lib.audio import plots
 
-# Params - [b0, b1, b2, a0, a1, a2]
+# Params - [b0, b1, b2, a0, a1]
 def onefilter (params, x):
     b = params[0:3]
-    a = params[3:6]
+    a = params[3:5]
     return signal.lfilter(b, a, x)
 
 Fs, drySignal = ioutils.loadWav('audioSamples/whiteNoiseRef.wav')
@@ -18,15 +18,16 @@ def fitnessFunc (params):
     return compare.compare_spectrum(targetSignal, onefilter(params, drySignal))
 
 filterPopulation = genetic.Population(
-    dimm=6,
-    means=zeros(6),
-    std_devs=ones(6) * 20,
+    dimm=5,
+    means=zeros(5),
+    std_devs=ones(5) * 20,
+    mutation=.5,
     fitness_func=fitnessFunc,
     stable_pop = 40
 )
 
 print("Evolving:")
-filterPopulation.evolve(100)
+filterPopulation.evolve(300)
 
 king = filterPopulation.selectMostFit(1)[0]
 #a change
@@ -35,12 +36,7 @@ print("Estimate: ", king)
 
 outSignal = onefilter(king, drySignal)
 
-fin, pin = signal.welch(targetSignal, Fs, scaling='spectrum')
-fout, pout = signal.welch(outSignal, Fs, scaling='spectrum')
-
-pyplot.loglog(fin, pin, fout, pout)
-pyplot.show()
+plots.plotSpectrum(targetSignal, outSignal, Fs)
 
 ioutils.saveWav('filterestimate.temp.wav', Fs, outSignal)
 ioutils.saveWav('filtertarget.temp.wav', Fs, targetSignal)
-
